@@ -54,8 +54,8 @@ the.app = App:extend {
 
 		grp:add(text1)
 		grp2:add(text3)
-
-		self:add(grp2)
+		grp:add(grp2)
+		--self:add(grp2)
 		self:add(grp)
 
 		self:add(text2)

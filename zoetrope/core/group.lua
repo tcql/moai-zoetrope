@@ -35,6 +35,13 @@ Group = Class:extend {
 
 		-- todo: fix this...
 		self._m_layer:insertProp(sprite._m_object)
+
+		--[[
+		if sprite:instanceOf(Group) then 
+			sprite._m_object:setViewport(the.view._m_viewport)
+		end
+		--]]
+		MOAIRenderMgr.pushRenderPass(sprite._m_object)
 	end,
 
 

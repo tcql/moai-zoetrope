@@ -15,33 +15,35 @@ View = Group:extend{
 		obj._m_viewport = viewport
 
 		obj._m_layer:setViewport(obj._m_viewport)
-		MOAISim.pushRenderPass(obj._m_layer)
-		--obj._m_viewport:setOffset(-0.5,-0.5)
+		MOAIRenderMgr.pushRenderPass(obj._m_layer)
+		
 		return obj
 	end,
 
 
 	add = function (self,sprite)
 
-		if sprite.instanceOf and sprite:instanceOf(Group) then
-			sprite._m_layer:setViewport(self._m_viewport)
-			--MOAIRenderMgr.pushRenderPass(sprite._m_object)
-		else 
-
-			MOAISim.pushRenderPass(sprite._m_object)
-		end
-
+		self:_recurseGroups(sprite)
 
 		Group.add(self,sprite)
-
-
-		--MOAISim.pushRenderPass(sprite._m_object)
 
 	end,
 
 	update = function(self,elapsed)
 
 		Group.update(self,elapsed)
+	end,
+
+
+	-- Utility method for ensuring any groups or subgroups that have been added to us
+	-- have their viewport set to our viewport. This feels kind of hacking
+	_recurseGroups = function (self,group)
+		if group:instanceOf(Group) then 
+			for _,spr in pairs(group.sprites) do 
+				self:_recurseGroups(spr)
+			end
+			group._m_layer:setViewport(self._m_viewport)
+		end
 	end
 
 
