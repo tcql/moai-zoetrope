@@ -44,7 +44,7 @@ Text = Sprite:extend {
 		self._m_textbox:setTextSize(16)
 		--self._m_textbox:setTextSize(12,72)
 		--self._m_textbox:setYFlip(true)
-		self._m_textbox:setRect(0,0,500,20)
+		self._m_textbox:setRect(0,0,500,100)
 
 		self._m_textbox:setString(self.text)
 

@@ -123,6 +123,7 @@ require 'zoetrope.core.group'
 require 'zoetrope.core.view'
 require 'zoetrope.core.sprite'
 require 'zoetrope.sprites.text'
+require 'zoetrope.sprites.tile'
 --[[
 require 'zoetrope.core.cached'
 

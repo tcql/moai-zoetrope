@@ -29,14 +29,9 @@ View = Group:extend{
 
 	end,
 
-	update = function(self,elapsed)
-
-		Group.update(self,elapsed)
-	end,
-
 
 	-- Utility method for ensuring any groups or subgroups that have been added to us
-	-- have their viewport set to our viewport. This feels kind of hacking
+	-- have their viewport set to our viewport. This feels kind of hackish
 	_recurseGroups = function (self,group)
 		if group:instanceOf(Group) then 
 			for _,spr in pairs(group.sprites) do 

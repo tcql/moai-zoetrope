@@ -458,25 +458,27 @@ App = Class:extend
 		if self.onStartFrame then self:onStartFrame(elapsed) end
 		--self.meta:startFrame(elapsed)
 		
-		--view:startFrame(elapsed)
+		view:startFrame(elapsed)
 		view:update(elapsed)	
 		--self.meta:update(elapsed)
 		if self.onUpdate then self:onUpdate(elapsed) end
 
-		--view:endFrame(elapsed)
+		view:endFrame(elapsed)
 		--self.meta:endFrame(elapsed)
 		if self.onEndFrame then self:onEndFrame(elapsed) end
 
 		-- Since MOAI rendering/simulation is separated, we can't really respond to draw events
 		-- in the normal way, so we'll treat any draw callbacks as happening after endFrame, even though
 		-- drawing technically isn't happening here
+
 		self:draw()
 
-		-- ensure we are stepping with respect to the timescale (in case the user has updated it since last tick)
-		--MOAISim.setStep(1/self.fps * self.timeScale)
 	end,
 	
 	draw = function (self)
+
+		self.view:draw()
+		if self.onDraw then self:onDraw() end
 		--[[
 		local inset = self.inset.x ~= 0 or self.inset.y ~= 0
 
