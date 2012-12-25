@@ -102,7 +102,13 @@ Animation = Sprite:extend
 
 
 	freeze = function(self,index)
-		self._m_sequences[self.currentSequence]:stop()
+		if self.currentSequence then 
+			self._m_sequences[self.currentSequence]:stop()
+		end
+
+		if self._set.image ~= self.image then
+			self:updateQuad()
+		end
 
 		if index then 
 			self._m_object:setIndex(index)
