@@ -87,11 +87,19 @@ Animation = Sprite:extend
 
 		assert(self.sequences[name], 'no animation sequence named "' .. name .. '"')
 
+		if self.sequences[name].loops == nil then 
+			self.sequences[name].loops = true 
+		end
+
 		if self.sequences[name] ~= self._set.sequences[name] then 
 			self:buildSequence(name)
 		end 
-
+		self.currentSequence = name
 		self._m_sequences[name]:start()
+	end,
+
+	freeze = function(self)
+		self._m_sequences[self.currentSequence]:stop()
 	end,
 
 
@@ -121,8 +129,49 @@ Animation = Sprite:extend
 			anim:setMode(MOAITimer.LOOP)
 		end
 
+		-- Set up the onEndSequence listener for when this sequence is done playing
+		local onStop = function () 
+			if self.onEndSequence then self:onEndSequence(sequence) end
+		end
+
+		anim:setListener ( MOAIAction.EVENT_STOP, onStop )
+
 		self._set.sequences[sequence] = seq
 		self._m_sequences[sequence] = anim
+
+	end,
+
+	draw = function(self,x,y)
+		x = math.floor(x or self.x)
+		y = math.floor(y or self.y)
+
+		if STRICT then
+			assert(type(x) == 'number', 'visible animation does not have a numeric x property')
+			assert(type(y) == 'number', 'visible animation does not have a numeric y property')
+			assert(type(self.width) == 'number', 'visible animation does not have a numeric width property')
+			assert(type(self.height) == 'number', 'visible animation does not have a numeric height property')
+		end
+
+		if not self.visible or not self.image or self.alpha <= 0 then return end
+		
+		-- if our image changed, update the quad
+		
+		if self._set.image ~= self.image then
+			self:updateQuad()
+		end
+		
+
+		-- draw the quad
+
+		local scaleX = self.scale * self.distort.x
+		local scaleY = self.scale * self.distort.y
+
+		if self.flipX then scaleX = scaleX * -1 end
+		if self.flipY then scaleY = scaleY * -1 end
+			
+		self._m_object:setLoc(x,y)
+		
+		Sprite.draw(self, x, y)
 
 	end
 
