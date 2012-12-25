@@ -8,8 +8,7 @@ select opt in $OPTIONS; do
 	elif [ -d "$opt" ]; then
 		cp -R ../zoetrope "$opt"
 		cd "$opt"
-		moai main.lua&
-		rm -rf "$opt/zoetrope/"
+		moai main.lua
 		exit
 	else
 		echo "Invalid option"
