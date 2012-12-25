@@ -2,6 +2,15 @@ Tile = Sprite:extend {
 
 	imageOffset = {x = 0, y = 0},
 
+
+	-- private property: keeps track of properties that need action
+	-- to be taken when they are changed
+	-- image must be a nonsense value, not nil,
+	-- for the tile to see that an image has been set if it
+	-- was initially nil
+	_set = { image = -1, imageOffset = { x = 0, y = 0 } },
+
+
 	new = function (self, obj)
 		obj = obj or {}
 		self:extend(obj)
@@ -15,7 +24,7 @@ Tile = Sprite:extend {
 	updateQuad = function(self)
 		if self.image then 
 			
-			texture = MOAITexture.new()
+			local texture = MOAITexture.new()
 			texture:load(self.image)
 			local width,height = texture:getSize()
 
@@ -26,7 +35,7 @@ Tile = Sprite:extend {
 			-- TODO: use Cached to optimize this; each individual spritesheet that is loaded
 			-- should be a MOAIGfxQuadDeck2D (probably), then individual Sprite classes that USE
 			-- them can add quads
-			spritesheet = MOAIGfxQuad2D.new()
+			local spritesheet = MOAIGfxQuad2D.new()
 			spritesheet:setTexture(self.image)
 			spritesheet:setUVRect(
 				self.imageOffset.x / width,
@@ -37,9 +46,9 @@ Tile = Sprite:extend {
 			spritesheet:setRect(0,0,self.width,self.height)
 			
 			if not self._m_object then 
-				prop = MOAIProp2D.new()
+				local prop = MOAIProp2D.new()
 			else
-				prop = self._m_object
+				local prop = self._m_object
 			end
 
 			prop:setDeck(spritesheet)
@@ -61,12 +70,26 @@ Tile = Sprite:extend {
 			self._m_object:setPiv(self.width/2,self.height/2)
 			self._m_object:setLoc(self.width/2,self.height/2)
 
+			self._set.image = self.image
+			self._set.imageOffset.x = self.imageOffset.x
+			self._set.imageOffset.y = self.imageOffset.y
+
 		end
 
 	end,
 
 	draw = function(self,x,y)
-		
+		if not self.visible or self.alpha <= 0 then return end
+
+		x = math.floor(x or self.x)
+		y = math.floor(y or self.y)
+
+		if self.image and (self.image ~= self._set.image or
+		   self.imageOffset.x ~= self._set.imageOffset.x or
+		   self.imageOffset.y ~= self._set.imageOffset.y) then
+			self:updateQuad()
+		end
+
 		self._m_translate:setLoc(x,y)
 		-- MOAI does rotation in degrees, but we want to keep our mathy compatibility, 
 		-- so we'll store rotation as rads, and convert to degrees before actual rotation

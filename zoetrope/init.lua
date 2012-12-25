@@ -124,6 +124,7 @@ require 'zoetrope.core.view'
 require 'zoetrope.core.sprite'
 require 'zoetrope.core.mouse'
 
+require 'zoetrope.sprites.animation'
 require 'zoetrope.sprites.text'
 require 'zoetrope.sprites.tile'
 --[[
