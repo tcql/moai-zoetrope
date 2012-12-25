@@ -7,6 +7,9 @@ Text = Sprite:extend {
 	x = 0,
 	y = 0,
 
+	width = 50,
+	height = 50,
+
 	new = function(self,obj)
 		obj=  obj or {}
 
@@ -44,7 +47,7 @@ Text = Sprite:extend {
 		self._m_textbox:setTextSize(16)
 		--self._m_textbox:setTextSize(12,72)
 		--self._m_textbox:setYFlip(true)
-		self._m_textbox:setRect(0,0,500,20)
+		self._m_textbox:setRect(0,0,500,100)
 
 		self._m_textbox:setString(self.text)
 
@@ -56,7 +59,7 @@ Text = Sprite:extend {
 	update = function (self,elapsed)
 		if self.onUpdate then self:onUpdate(elapsed) end 
 
-		self:draw(self.x,self.y)
+		--self:draw(self.x,self.y)
 
 	end,
 

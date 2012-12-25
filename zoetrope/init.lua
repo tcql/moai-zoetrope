@@ -122,7 +122,11 @@ require 'zoetrope.core.group'
 
 require 'zoetrope.core.view'
 require 'zoetrope.core.sprite'
+require 'zoetrope.core.mouse'
+
+require 'zoetrope.sprites.animation'
 require 'zoetrope.sprites.text'
+require 'zoetrope.sprites.tile'
 --[[
 require 'zoetrope.core.cached'
 
@@ -130,7 +134,6 @@ require 'zoetrope.core.sprite'
 require 'zoetrope.core.gamepad'
 require 'zoetrope.core.group'
 require 'zoetrope.core.keys'
-require 'zoetrope.core.mouse'
 require 'zoetrope.core.promise'
 require 'zoetrope.core.timer'
 require 'zoetrope.core.tween'
