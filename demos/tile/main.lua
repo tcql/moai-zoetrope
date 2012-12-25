@@ -26,7 +26,6 @@ the.app = App:extend {
 		t1 = zoetile:new 
 		{
 
-			debug = true,
 			x = the.app.width/2-32,
 			y = the.app.height/2-32,
 			
