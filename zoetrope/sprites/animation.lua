@@ -96,11 +96,21 @@ Animation = Sprite:extend
 		end 
 		self.currentSequence = name
 		self._m_sequences[name]:start()
+		self.paused = false
 	end,
 
-	freeze = function(self)
+
+
+	freeze = function(self,index)
 		self._m_sequences[self.currentSequence]:stop()
+
+		if index then 
+			self._m_object:setIndex(index)
+		end
+
+		self.paused = true
 	end,
+
 
 
 	-- private method: buildSequence 
@@ -131,6 +141,7 @@ Animation = Sprite:extend
 
 		-- Set up the onEndSequence listener for when this sequence is done playing
 		local onStop = function () 
+			self.paused = true
 			if self.onEndSequence then self:onEndSequence(sequence) end
 		end
 
