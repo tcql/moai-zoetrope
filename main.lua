@@ -16,15 +16,23 @@ the.app = App:extend {
 			
 
 			--velocity = {x = 50, y = 50, rotation = math.pi},
-			acceleration = { x = 10, y = 10, rotation = 0.5},
+			acceleration = { rotation = 1},
 
 
 			onUpdate = function(self,dt)
+				self.x = the.mouse.x
+				self.y = the.mouse.y
 				--self.rotation = self.rotation+math.rad(180)*dt
 				--self.x = self.x+20*dt
 			end
 		}
+		text =Text:new {
 
+			onUpdate = function(self,dt)
+				self.text = the.mouse.x .. "\n" .. the.mouse.y
+			end 
+		}
+		self:add(text)
 		self:add(t)
 
 	end

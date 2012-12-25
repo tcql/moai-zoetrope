@@ -172,6 +172,8 @@ App = Class:extend
 		self.view = View:new()
 		the.view = self.view
 
+		self.mouse = self.mouse or Mouse:new()
+		the.view:add(self.mouse)
 		-- add a layer to the viewport
 		--layer = MOAILayer2D.new()
 		--layer:setViewport(viewport)

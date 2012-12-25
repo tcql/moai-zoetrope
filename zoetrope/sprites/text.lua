@@ -7,6 +7,9 @@ Text = Sprite:extend {
 	x = 0,
 	y = 0,
 
+	width = 50,
+	height = 50,
+
 	new = function(self,obj)
 		obj=  obj or {}
 
@@ -56,7 +59,7 @@ Text = Sprite:extend {
 	update = function (self,elapsed)
 		if self.onUpdate then self:onUpdate(elapsed) end 
 
-		self:draw(self.x,self.y)
+		--self:draw(self.x,self.y)
 
 	end,
 

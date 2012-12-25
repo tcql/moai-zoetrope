@@ -37,14 +37,16 @@ Group = Class:extend {
 		table.insert(self.sprites,sprite)
 
 		-- todo: fix this...
-		self._m_layer:insertProp(sprite._m_object)
+		if sprite._m_object then 
+			self._m_layer:insertProp(sprite._m_object)
 
-		--[[
-		if sprite:instanceOf(Group) then 
-			sprite._m_object:setViewport(the.view._m_viewport)
+			--[[
+			if sprite:instanceOf(Group) then 
+				sprite._m_object:setViewport(the.view._m_viewport)
+			end
+			--]]
+			MOAIRenderMgr.pushRenderPass(sprite._m_object)
 		end
-		--]]
-		MOAIRenderMgr.pushRenderPass(sprite._m_object)
 	end,
 
 
