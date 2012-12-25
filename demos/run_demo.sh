@@ -1,5 +1,5 @@
 #!/bin/bash
-OPTIONS="`find . -type d -printf '%f ' | sed -e 's/\. //g'` Quit"
+OPTIONS="`find . -maxdepth 1 -type d -printf '%f ' | sed -e 's/\. //g'` Quit"
 
 select opt in $OPTIONS; do 
 	if [ "$opt" = "Quit" ]; then 
