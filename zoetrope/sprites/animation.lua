@@ -67,13 +67,31 @@ Animation = Sprite:extend
 
 			local deck = MOAITileDeck2D.new ()
 			deck:setTexture(texture)
+			deck:setUVRect(
+				0.5,
+				.5,
+				1.5,
+				-0.5
+			)
+
 			deck:setRect(0,0,self.width,self.height)
 			-- Sets how many quads there are
 			deck:setSize(math.floor(width/self.width),math.floor(height/self.height))
 
+			-- We have to flip the UV coordinates around 
+			-- since we are using window coordinates instead 
+			-- of model coordinates
+			
+			self._m_translate = MOAITransform2D.new()
+			--prop:setLoc(self.x,self.y)
+			self._m_translate:setPiv(0,0)
+			self._m_translate:setLoc(0,0)
 
 			self._m_object = MOAIProp2D.new()
 			self._m_object:setDeck(deck)
+			self._m_object:setParent(self._m_translate)
+			self._m_object:setPiv(self.width/2,self.height/2)
+			self._m_object:setLoc(self.width/2,self.height/2)
 
 			self._set.image = self.image
 		end
@@ -190,8 +208,9 @@ Animation = Sprite:extend
 		if self.flipX then scaleX = scaleX * -1 end
 		if self.flipY then scaleY = scaleY * -1 end
 			
-		self._m_object:setLoc(x,y)
-		
+		self._m_translate:setLoc(x,y)
+		self._m_object:setRot(math.deg(self.rotation))
+
 		Sprite.draw(self, x, y)
 
 	end

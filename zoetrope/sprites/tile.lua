@@ -13,7 +13,7 @@ Tile = Sprite:extend {
 
 	new = function (self, obj)
 		obj = obj or {}
-		self:extend(obj)
+		obj = self:extend(obj)
 		
 		if obj.image then obj:updateQuad() end
 		if obj.onNew then obj:onNew() end
@@ -44,11 +44,12 @@ Tile = Sprite:extend {
 				(self.imageOffset.y+self.height) / height	
 			)
 			spritesheet:setRect(0,0,self.width,self.height)
-			
+
+			local prop
 			if not self._m_object then 
-				local prop = MOAIProp2D.new()
+				prop = MOAIProp2D.new()
 			else
-				local prop = self._m_object
+				prop = self._m_object
 			end
 
 			prop:setDeck(spritesheet)
@@ -71,8 +72,7 @@ Tile = Sprite:extend {
 			self._m_object:setLoc(self.width/2,self.height/2)
 
 			self._set.image = self.image
-			self._set.imageOffset.x = self.imageOffset.x
-			self._set.imageOffset.y = self.imageOffset.y
+			self._set.imageOffset = { x = self.imageOffset.x, y = self.imageOffset.y }
 
 		end
 
@@ -90,13 +90,14 @@ Tile = Sprite:extend {
 			self:updateQuad()
 		end
 
-		self._m_translate:setLoc(x,y)
-		-- MOAI does rotation in degrees, but we want to keep our mathy compatibility, 
-		-- so we'll store rotation as rads, and convert to degrees before actual rotation
-		-- make rotations be around center
-		--self._m_object:setPiv(self.width/2,self.height/2)
-		self._m_object:setRot(math.deg(self.rotation))
+		if self.image then 
+			self._m_translate:setLoc(x,y)
+			-- MOAI does rotation in degrees, but we want to keep our mathy compatibility, 
+			-- so we'll store rotation as rads, and convert to degrees before actual rotation
+			-- make rotations be around center
+			--self._m_object:setPiv(self.width/2,self.height/2)
+			self._m_object:setRot(math.deg(self.rotation))
+		end
 
-		--self._m_object:setPiv(0,0)
 	end
 }
