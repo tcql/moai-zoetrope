@@ -19,6 +19,7 @@ the.app = App:extend {
 
 			onEndSequence = function (self)
 				t.text = 'stopped'
+				frameCounter = self.currentFrame + 1
 			end
 
 		}
