@@ -157,10 +157,14 @@ App = Class:extend
 		
 		if not self.width then 
 			screenWidth = MOAIEnvironment.screenWidth or 640
+		else 
+			screenWidth = self.width
 		end 
 
 		if not self.height then 
 			screenHeight = MOAIEnvironment.screenHeight or 480
+		else
+			screenHeight = self.height
 		end			
 
 		self.width = screenWidth
@@ -172,8 +176,24 @@ App = Class:extend
 		self.view = View:new()
 		the.view = self.view
 
-		self.mouse = self.mouse or Mouse:new()
-		the.view:add(self.mouse)
+		-- Selectively add the mouse components
+		if self:hasMouse() then 
+			self.mouse = self.mouse or Mouse:new()
+			the.view:add(self.mouse)
+		end
+
+		if self:hasAccelerometer() then
+			self.accelerometer = self.accelerometer or Accelerometer:new()
+			the.view:add(self.accelerometer)
+		end
+
+	
+		MOAIGfxDevice.setListener ( MOAIGfxDevice.EVENT_RESIZE, 
+			function(width,height)
+				self:setSizeAndOrientation(width,height)
+			end
+		)
+
 		-- add a layer to the viewport
 		--layer = MOAILayer2D.new()
 		--layer:setViewport(viewport)
@@ -193,6 +213,46 @@ App = Class:extend
 		the.app = obj
 		if obj.onNew then obj:onNew() end
 		return obj
+	end,
+
+
+	hasMouse = function () 
+		if MOAIInputMgr.device.pointer then 
+			return true 
+		else 
+			return false 
+		end
+	end,
+
+	hasTouch = function ()
+		if MOAIInputMgr.device.touch then 
+			return true
+		else 
+			return false
+		end
+	end,
+
+	hasAccelerometer = function () 
+		if MOAIInputMgr.device.level then
+			return true
+		else 
+			return false
+		end
+	end,
+
+	hasKeyboard = function () 
+		if MOAIInputMgr.device.keyboard then 
+			return true
+		else 
+			return false 
+		end
+	end,
+
+	setSizeAndOrientation = function (self, width, height)
+		self.width = width
+		self.height = height
+		self.view._m_viewport:setSize(width,height)
+		self.view._m_viewport:setScale(width,- height)
 	end,
 
 	-- Method: run
