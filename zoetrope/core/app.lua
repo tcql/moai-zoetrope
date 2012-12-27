@@ -53,6 +53,18 @@ App = Class:extend
 	-- window loses focus?
 	deactivateOnBlur = true,
 	
+
+	-- Property: allowScreenRotation
+	-- Should the screen automatically rotate on mobile devices then the screen orientation
+	-- changes?
+	allowScreenRotation = true,
+
+
+	-- Property: allowResizing
+	-- Should users be allowed to resize the application window when playing on desktop platforms?
+	allowResizing = true,
+
+
 	-- Property: view
 	-- The current <View>. When the app is running, this is also accessible
 	-- globally via <the>.view. In order to switch views, you must set this
@@ -116,17 +128,6 @@ App = Class:extend
 		
 		-- input
 
-		if love.keyboard then
-			obj.keys = obj.keys or Keys:new()
-			love.keyboard.setKeyRepeat(0.4, 0.04)
-			obj.meta:add(obj.keys)
-		end
-
-		if love.mouse then
-			obj.mouse = obj.mouse or Mouse:new()
-			obj.meta:add(obj.mouse)
-		end
-
 		if love.joystick then
 			obj.gamepads = {}
 			the.gamepads = obj.gamepads
@@ -138,10 +139,6 @@ App = Class:extend
 				obj.meta:add(obj.gamepads[i])
 			end
 		end
-
-		-- screen dimensions and state
-
-		obj.width, obj.height, obj.fullscreen = love.graphics.getMode()
 		--]]
 		-- housekeeping
 		
@@ -154,29 +151,21 @@ App = Class:extend
 		--]]
 
 		--[[ ----------------------------------------------------------- --]]
-		
-		if not self.width then 
-			screenWidth = MOAIEnvironment.screenWidth or 640
-		else 
-			screenWidth = self.width
-		end 
-
-		if not self.height then 
-			screenHeight = MOAIEnvironment.screenHeight or 480
+	
+		if self:isMobile() then 
+			self.width,self.height = MOAIGfxDevice.getViewSize()
 		else
-			screenHeight = self.height
-		end			
-
-		self.width = screenWidth
-		self.height = screenHeight
+			self.width 	= self.width or 800 
+			self.height = self.height or 600
+		end
 
 		-- Open up the window
-		MOAISim.openWindow("Window",screenWidth,screenHeight)
+		MOAISim.openWindow("Window",self.width,self.height)
 
 		self.view = View:new()
 		the.view = self.view
 
-		-- Selectively add the mouse components
+		-- Selectively add the input components
 		if self:hasMouse() then 
 			self.mouse = self.mouse or Mouse:new()
 			the.view:add(self.mouse)
@@ -187,32 +176,34 @@ App = Class:extend
 			the.view:add(self.accelerometer)
 		end
 
-	
-		MOAIGfxDevice.setListener ( MOAIGfxDevice.EVENT_RESIZE, 
-			function(width,height)
-				self:setSizeAndOrientation(width,height)
-			end
-		)
+		if self:hasTouch() then 
+			self.touch = self.touch or Touch:new() 
+			the.view:add(self.touch)
+		end
 
-		-- add a layer to the viewport
-		--layer = MOAILayer2D.new()
-		--layer:setViewport(viewport)
 
-		--self.layer = layer
+		-- Resizing only applies on desktop, and screen rotation only applies on mobile,
+		-- but they both use the same underlying mechanics
+		if (self.allowResizing and self:isDesktop()) or (self.allowScreenRotation and self:isMobile())then
+			MOAIGfxDevice.setListener ( MOAIGfxDevice.EVENT_RESIZE, 
+				function(width,height)
+					self:setSizeAndOrientation(width,height)
+				end
+			)
+		end
+		
 
-		--MOAIGfxDevice.setClearColor(1,0.41,0.70,1)
-		--MOAIRenderMgr.pushRenderPass(layer)
-
+		-- Set what the time between update ticks should be
 		MOAISim.setStep(1/self.fps)
 
 		--[[ ----------------------------------------------------------- --]]
 
-
-
-
 		the.app = obj
 		if obj.onNew then obj:onNew() end
+
+
 		return obj
+
 	end,
 
 
@@ -248,11 +239,31 @@ App = Class:extend
 		end
 	end,
 
+	isMobile = function (self)
+		local platform = self:getPlatform()
+
+		if platform == "Android" or platform == "iOS" then 
+			return true
+		else 
+			return false
+		end
+	end,
+
+	isDesktop = function (self)
+		return not self:isMobile()
+	end,
+
+	getPlatform = function ()
+		return MOAIEnvironment.osBrand
+	end,
+
 	setSizeAndOrientation = function (self, width, height)
 		self.width = width
 		self.height = height
+		print(self.width)
+		print(self.height)
 		self.view._m_viewport:setSize(width,height)
-		self.view._m_viewport:setScale(width,- height)
+		self.view._m_viewport:setScale(width,-height)
 	end,
 
 	-- Method: run

@@ -124,6 +124,7 @@ require 'zoetrope.core.view'
 require 'zoetrope.core.sprite'
 require 'zoetrope.input.mouse'
 require 'zoetrope.input.accelerometer'
+require 'zoetrope.input.touch'
 
 require 'zoetrope.sprites.animation'
 require 'zoetrope.sprites.text'

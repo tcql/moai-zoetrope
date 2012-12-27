@@ -31,7 +31,7 @@ Accelerometer = Sprite:extend {
 
 
     getRoll = function(self)
-        return math.atan2(self.y,self.z)*180/math.pi
+        return math.atan2(self.y,self.z) * 180/math.pi
     end,
 
 
