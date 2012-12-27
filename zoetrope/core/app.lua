@@ -182,6 +182,9 @@ App = Class:extend
 		end
 
 
+		-- Note... currently, disabling allowResizing 
+		-- is /completely breaking/ android. you simply get a black screen
+
 		-- Resizing only applies on desktop, and screen rotation only applies on mobile,
 		-- but they both use the same underlying mechanics
 		if (self.allowResizing and self:isDesktop()) or (self.allowScreenRotation and self:isMobile())then

@@ -163,10 +163,12 @@ Touch = Sprite:extend
         local result = {}
 
         for key,value in pairs(self._lastFrame) do
-            if not self._thisFrame[key] then 
+            if self._lastFrame[key] and not self._thisFrame[key] then 
                 table.insert(result,key)
             end
         end
+
+        return result
     end,
 
 
@@ -188,8 +190,6 @@ Touch = Sprite:extend
         for key, value in pairs(self._thisFrame) do
             self._lastFrame[key] = value
         end
-
-        --self.x, self.y = the.view._m_object:wndToWorld ( MOAIInputMgr.device.pointer:getLoc () )
 
         Sprite.endFrame(self)
     end,
