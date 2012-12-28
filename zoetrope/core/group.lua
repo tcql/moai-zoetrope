@@ -72,7 +72,14 @@ Group = Class:extend {
 				sprite._m_object:setViewport(the.view._m_viewport)
 			end
 			--]]
-			MOAIRenderMgr.pushRenderPass(sprite._m_object)
+
+			-- TODO: figure out why this line is REALLY screwy.
+			-- It seems to be necessary when dealing with nested groups (?)
+			-- but completely breaks things when not.
+			-- With it removed, the timescales demo is broken,
+			-- with it added in, the touch demo doesn't work correctly, because 
+			-- things aren't :remove()'d  correctly
+			--MOAIRenderMgr.pushRenderPass(sprite._m_object)
 		end
 	end,
 
@@ -94,7 +101,9 @@ Group = Class:extend {
 
                 -- moai code to stop visibly rendering 
                 -- the sprite on this layer
-                self._m_layer:removeProp(sprite)
+                if sprite._m_object then
+	                self._m_layer:removeProp(sprite._m_object)
+	            end
                 return
             end
         end
@@ -181,6 +190,31 @@ Group = Class:extend {
 	end,
 
 	
+
+
+    __tostring = function (self)
+        local result = 'Group ('
+
+        if self.active then
+                result = result .. 'active'
+        else
+                result = result .. 'inactive'
+        end
+
+        if self.visible then
+                result = result .. ', visible'
+        else
+                result = result .. ', invisible'
+        end
+
+        if self.solid then
+                result = result .. ', solid'
+        else
+                result = result .. ', not solid'
+        end
+
+        return result .. ', ' .. self:count(true) .. ' sprites)'
+    end
 	
 	
 }

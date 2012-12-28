@@ -334,8 +334,7 @@ App = Class:extend
 	setSizeAndOrientation = function (self, width, height)
 		self.width = width
 		self.height = height
-		print(self.width)
-		print(self.height)
+		
 		self.view._m_viewport:setSize(width,height)
 		self.view._m_viewport:setScale(width,-height)
 	end,

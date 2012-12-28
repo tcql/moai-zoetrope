@@ -1,8 +1,10 @@
+STRICT = true
 require 'zoetrope.init'
 
 
 activeTouches = {}
 activeBubbles = {}
+
 
 bubble = Tile:extend {
     id = "0",
@@ -58,17 +60,19 @@ the.app = App:extend
     onUpdate = function(self,dt)
         if the.app:hasTouch() then 
             
-            local pressed = the.touch:getEvent(the.touch:allPressed())
+            local pressed = the.touch:getEvents(the.touch:allPressed())
             local released = the.touch:allJustReleased()
 
             for _,v in pairs(released) do
                 if activeBubbles[v] then
-                    activeBubbles[v]:die()
+                    self:remove(activeBubbles[v])
+                    --activeBubbles[v]:die()
                 end
                 activeTouches[v] = nil
             end
 
             for k,v in pairs(pressed) do 
+                activeTouches[k] = v
                 if the.touch:justPressed(k) then 
                     local b = bubble:new{id = k}
 
@@ -76,7 +80,7 @@ the.app = App:extend
                     activeBubbles[k] = b
                 end 
 
-                activeTouches[k] = v
+                
             end
 
         end
