@@ -35,19 +35,19 @@ the.app = App:extend
 
                     if the.touch:pressed() then 
                         local pressed = the.touch:allPressed()
-                        local touches = the.touch:getEvent(pressed)
+                        local touches = the.touch:getEvents(pressed)
 
                     
-                        text.text = ''
+                        self.text = ''
                         for _,v in pairs(pressed) do
                             local loc = touches[v]
-                            text.text = text.text..v..": x = "..loc.x..", y = "..loc.y.."\n"
+                            self.text = self.text..v..": x = "..loc.x..", y = "..loc.y.."\n"
                         end
                     else
-                        text.text = 'no touches'
+                        self.text = 'no touches'
                     end   
                 else
-                    text = "Sorry, you don't have touch capability." 
+                    self.text = "Sorry, you don't have touch capability." 
                 end
             end
         }
@@ -56,7 +56,6 @@ the.app = App:extend
     end,
 
     onUpdate = function(self,dt)
-
         if the.app:hasTouch() then 
             
             local pressed = the.touch:getEvent(the.touch:allPressed())

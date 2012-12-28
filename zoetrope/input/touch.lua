@@ -46,9 +46,10 @@ Touch = Sprite:extend
 
     touchPressed = function(self,touch_id, tap_x, tap_y, taps)
         self._thisFrame[touch_id] = true
+        local world_x,world_y = the.view._m_object:wndToWorld(tap_x,tap_y)
         self._touches[touch_id] = {
-            x = tap_x,
-            y = tap_y,
+            x = world_x,
+            y = world_y,
             tap_count = taps
         }
     end,
@@ -61,9 +62,10 @@ Touch = Sprite:extend
 
 
     touchMoved = function(self, touch_id, tap_x, tap_y)
+        local world_x,world_y = the.view._m_object:wndToWorld(tap_x,tap_y)
         self._touches[touch_id] = { 
-            x = tap_x,
-            y = tap_y,
+            x = world_x,
+            y = world_y,
             tap_count = 0 
         }
     end,
@@ -172,7 +174,7 @@ Touch = Sprite:extend
     end,
 
 
-    getEvent = function(self,id) 
+    getEvents = function(self,id) 
         if type(id) ~= "table" then 
             id = {id}
         end

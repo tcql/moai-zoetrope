@@ -210,6 +210,15 @@ App = Class:extend
 	end,
 
 
+	-- Method: hasMouse
+	-- Returns a boolean describing whether or not a mouse interface
+	-- is available
+	--
+	-- Arguments:
+	--		none 
+	--
+	-- Returns:
+	-- 		boolean whether there is a mouse interface
 	hasMouse = function () 
 		if MOAIInputMgr.device.pointer then 
 			return true 
@@ -218,6 +227,16 @@ App = Class:extend
 		end
 	end,
 
+
+	-- Method: hasTouch
+	-- Returns a boolean describing whether or not a touch interface
+	-- is available
+	--
+	-- Arguments:
+	--		none
+	-- 
+	-- Returns: 
+	-- 		boolean whether there is a touch interface
 	hasTouch = function ()
 		if MOAIInputMgr.device.touch then 
 			return true
@@ -226,6 +245,16 @@ App = Class:extend
 		end
 	end,
 
+
+	-- Method: hasAccelerometer
+	-- Returns a boolean describing whether or not an
+	-- accelerometer is available
+	--
+	-- Arguments:
+	-- 		none 
+	--
+	-- Returns:
+	-- 		boolean whether there is an accelerometer
 	hasAccelerometer = function () 
 		if MOAIInputMgr.device.level then
 			return true
@@ -234,6 +263,16 @@ App = Class:extend
 		end
 	end,
 
+
+	-- Method: hasKeyboard
+	-- Returns a boolean describing whether or not 
+	-- a keyboard interface is available
+	-- 
+	-- Arguments:
+	-- 		none
+	--
+	-- Returns:
+	-- 		boolean whether there is a keyboard interface
 	hasKeyboard = function () 
 		if MOAIInputMgr.device.keyboard then 
 			return true
@@ -242,6 +281,16 @@ App = Class:extend
 		end
 	end,
 
+
+	-- Method: isMobile
+	-- Returns a boolean describing whether or not
+	-- the app is currently running on a mobile platform
+	--
+	-- Arguments:
+	-- 		none
+	-- 
+	-- Returns:
+	-- 		boolean whether the app is running on a mobile platform
 	isMobile = function (self)
 		local platform = self:getPlatform()
 
@@ -252,14 +301,36 @@ App = Class:extend
 		end
 	end,
 
+
+	-- Method: isDesktop
+	-- Returns a boolean describing whether or not 
+	-- the app is currently running on a desktop platform
+	--
+	-- Arguments:
+	-- 		none
+	-- 
+	-- Returns:
+	-- 		boolean whether the app is running on a desktop platform
 	isDesktop = function (self)
 		return not self:isMobile()
 	end,
 
+
+	-- Method: getPlatform
+	-- Returns which platform the app is running on
+	--
+	-- Arguments:
+	-- 		none
+	--
+	-- Returns
+	-- 		string name of the platform the app is running on
 	getPlatform = function ()
 		return MOAIEnvironment.osBrand
 	end,
 
+
+	-- TODO: support custom world scaling.
+	-- Right now scaling is forced 1:1
 	setSizeAndOrientation = function (self, width, height)
 		self.width = width
 		self.height = height
@@ -269,6 +340,7 @@ App = Class:extend
 		self.view._m_viewport:setScale(width,-height)
 	end,
 
+
 	-- Method: run
 	-- Starts the app running. Nothing will occur until this call.
 	--
@@ -277,7 +349,6 @@ App = Class:extend
 	-- 
 	-- Returns:
 	--		nothing
-
 	run = function (self)
 		math.randomseed(os.time())
 
@@ -292,17 +363,8 @@ App = Class:extend
 			self.meta:add(self.console)
 		end
 
-		-- set up callbacks
-		--[[
-		love.graphics.setCaption(self.name)
-		love.update = function (elapsed) self:update(elapsed) end
-		love.draw = function() self:draw() end
-		love.focus = function (value) self:onFocus(value) end	
 
-		if self.onRun then self:onRun() end
-		self._nextFrameTime = love.timer.getMicroTime()
-		--]]
-
+		-- Initialize the game simulation loop
 
 		mainThread = MOAICoroutine.new() 
 		mainThread:run(
@@ -311,7 +373,9 @@ App = Class:extend
 
 					coroutine.yield()
 
-					
+					-- each tick, call the app's update method,
+					-- which will cascade update events into every 
+					-- element in the.view
 					self:update(MOAISim.getStep())
 
 				end
@@ -323,6 +387,7 @@ App = Class:extend
 		
 	end,
 	
+
 	-- Method: quit
 	-- Quits the application immediately.
 	--
@@ -333,8 +398,9 @@ App = Class:extend
 	--		nothing
 
 	quit = function (self)
-		love.event.quit()
+		os.exit()
 	end,
+
 
 	-- Method: useSysCursor
 	-- Shows or hides the system mouse cursor.
@@ -353,6 +419,7 @@ App = Class:extend
 
 		love.mouse.setVisible(value)
 	end,
+
 
 	-- Method: enterFullscreen
 	-- Enters fullscreen mode. If the app is already in fullscreen, this has no effect.
@@ -504,33 +571,10 @@ App = Class:extend
 		if the.view ~= view then the.view = view end
 		
 		elapsed = elapsed * self.timeScale
-		--[[
-		-- set the next frame time right at the start
-		self._nextFrameTime = self._nextFrameTime + 1 / self.fps
-
-		elapsed = elapsed - (self._sleepTime or 0)
-
-		local realElapsed = elapsed
-		elapsed = elapsed * self.timeScale
-
-		-- sync the.view with our current view
-		
-		
-		if the.view ~= view then the.view = view end
-
-		-- if we are not active at all, sleep for a half-second
-
-		if not self.active then
-			love.timer.sleep(0.5)
-			self._sleepTime = 0.5
-			return
-		end
-
-		self._sleepTime = 0
 
 		-- update everyone
 		-- app gets precedence, then meta view, then view
-		--]]
+		
 		if self.onStartFrame then self:onStartFrame(elapsed) end
 		--self.meta:startFrame(elapsed)
 		
