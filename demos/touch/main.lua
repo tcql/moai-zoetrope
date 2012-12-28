@@ -30,6 +30,8 @@ the.app = App:extend
 
 
     onRun = function (self)
+
+        self:_debugInputs()
         
         text = Text:new {
             onUpdate = function (self,dt)

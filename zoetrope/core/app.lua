@@ -181,6 +181,11 @@ App = Class:extend
 			the.view:add(self.touch)
 		end
 
+		if self:hasGPS() then 
+			self.gps = self.gps or GPS:new()
+			the.view:add(self.gps)
+		end
+
 
 		-- Note... currently, disabling allowResizing 
 		-- is /completely breaking/ android. you simply get a black screen
@@ -210,6 +215,14 @@ App = Class:extend
 	end,
 
 
+	-- TODO: make this part of the DEBUG setup (once that's actually a thing)
+	_debugInputs = function()
+		for k,v in pairs(MOAIInputMgr.device.__index) do
+            print(k)
+        end
+	end,
+
+
 	-- Method: hasMouse
 	-- Returns a boolean describing whether or not a mouse interface
 	-- is available
@@ -219,6 +232,7 @@ App = Class:extend
 	--
 	-- Returns:
 	-- 		boolean whether there is a mouse interface
+
 	hasMouse = function () 
 		if MOAIInputMgr.device.pointer then 
 			return true 
@@ -237,6 +251,7 @@ App = Class:extend
 	-- 
 	-- Returns: 
 	-- 		boolean whether there is a touch interface
+
 	hasTouch = function ()
 		if MOAIInputMgr.device.touch then 
 			return true
@@ -255,10 +270,30 @@ App = Class:extend
 	--
 	-- Returns:
 	-- 		boolean whether there is an accelerometer
+
 	hasAccelerometer = function () 
 		if MOAIInputMgr.device.level then
 			return true
 		else 
+			return false
+		end
+	end,
+
+
+	-- Method: hasGPS
+	-- Returns a boolean describing whether or not
+	-- a GPS interface is available
+	-- 
+	-- Arguments:
+	-- 		none
+	--
+	-- Returns:
+	-- 		boolean whether there is a keyboard interface
+
+	hasGPS = function ()
+		if MOAIInputMgr.device.location then 
+			return true
+		else
 			return false
 		end
 	end,
@@ -273,6 +308,7 @@ App = Class:extend
 	--
 	-- Returns:
 	-- 		boolean whether there is a keyboard interface
+
 	hasKeyboard = function () 
 		if MOAIInputMgr.device.keyboard then 
 			return true
@@ -291,6 +327,7 @@ App = Class:extend
 	-- 
 	-- Returns:
 	-- 		boolean whether the app is running on a mobile platform
+
 	isMobile = function (self)
 		local platform = self:getPlatform()
 
