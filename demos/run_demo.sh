@@ -1,5 +1,7 @@
 #!/bin/bash
-OPTIONS="`find . -maxdepth 1 -type d -printf '%f ' | sed -e 's/\. //g'` Quit"
+OPTIONS="`find \`ls -l | awk ' /^d/ {print $NF }'\` -maxdepth 0 -type d -printf '%f '` Quit"
+
+
 
 select opt in $OPTIONS; do 
 	if [ "$opt" = "Quit" ]; then 

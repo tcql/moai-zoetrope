@@ -1,3 +1,21 @@
+-- Class: Group
+-- A group is a set of sprites. Groups can be used to
+-- implement layers or keep categories of sprites together.
+--
+-- Extends:
+--              <Class>
+--
+-- Event: onDraw
+-- Called after all member sprites are drawn onscreen.
+--
+-- Event: onUpdate
+-- Called once each frame, with the elapsed time since the last frame in seconds.
+--
+-- Event: onBeginFrame
+-- Called once each frame like onUpdate, but guaranteed to fire before any others' onUpdate handlers.
+--
+-- Event: onEndFrame
+-- Called once each frame like onUpdate, but guaranteed to fire after all others' onUpdate handlers.
 
 
 Group = Class:extend {
@@ -31,6 +49,15 @@ Group = Class:extend {
 		return obj
 	end,
 
+	
+	-- Method: add
+    -- Adds a sprite to the group.
+    --
+    -- Arguments:
+    --              sprite - <Sprite> to add
+    --
+    -- Returns:
+    --              nothing
 
 	add = function (self, sprite)
 
@@ -45,8 +72,47 @@ Group = Class:extend {
 				sprite._m_object:setViewport(the.view._m_viewport)
 			end
 			--]]
-			MOAIRenderMgr.pushRenderPass(sprite._m_object)
+
+			-- TODO: figure out why this line is REALLY screwy.
+			-- It seems to be necessary when dealing with nested groups (?)
+			-- but completely breaks things when not.
+			-- With it removed, the timescales demo is broken,
+			-- with it added in, the touch demo doesn't work correctly, because 
+			-- things aren't :remove()'d  correctly
+			--MOAIRenderMgr.pushRenderPass(sprite._m_object)
 		end
+	end,
+
+
+    -- Method: remove
+    -- Removes a sprite from the group. If the sprite is
+    -- not in the group, this does nothing.
+    -- 
+    -- Arguments:
+    --              sprite - <Sprite> to remove
+    -- 
+    -- Returns:
+    --              nothing
+
+	remove = function(self,sprite)
+		for i, spr in ipairs(self.sprites) do
+            if spr == sprite then
+                table.remove(self.sprites, i)
+
+                -- moai code to stop visibly rendering 
+                -- the sprite on this layer
+                if sprite._m_object then
+	                self._m_layer:removeProp(sprite._m_object)
+	            end
+                return
+            end
+        end
+        
+        if STRICT then
+            local info = debug.getinfo(2, 'Sl')
+            print('Warning: asked to remove a sprite from a group it was not a member of (' ..
+                      info.short_src .. ' line ' .. info.currentline .. ')')
+        end
 	end,
 
 
@@ -124,6 +190,31 @@ Group = Class:extend {
 	end,
 
 	
+
+
+    __tostring = function (self)
+        local result = 'Group ('
+
+        if self.active then
+                result = result .. 'active'
+        else
+                result = result .. 'inactive'
+        end
+
+        if self.visible then
+                result = result .. ', visible'
+        else
+                result = result .. ', invisible'
+        end
+
+        if self.solid then
+                result = result .. ', solid'
+        else
+                result = result .. ', not solid'
+        end
+
+        return result .. ', ' .. self:count(true) .. ' sprites)'
+    end
 	
 	
 }

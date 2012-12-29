@@ -102,12 +102,14 @@
 		self.active = false
 		self.visible = false
 		self.solid = false
+		self._m_object:setVisible(false)
 	end,
 
 	revive = function(self)
 		self.active = true
 		sefl.visible = true
 		self.solid = true
+		self._m_object:setVisible(true)
 	end,
 
 	startFrame = function(self,elapsed)

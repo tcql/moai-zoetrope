@@ -34,7 +34,7 @@ Text = Sprite:extend {
 		charcodes = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 .,:;!?()&/-'
 
 		bitmapFontReader = MOAIBitmapFontReader.new ()
-		bitmapFontReader:loadPage ( 'FontVerdana18.png', charcodes, 16 )
+		bitmapFontReader:loadPage ( 'FontVerdana18.png', charcodes, 18 )
 		self._m_font:setReader ( bitmapFontReader )
 
 		glyphCache = MOAIGlyphCache.new ()
@@ -44,10 +44,10 @@ Text = Sprite:extend {
 		--self._m_font:load('comic.ttf')
 
 		self._m_textbox:setFont(self._m_font)
-		self._m_textbox:setTextSize(16)
+		self._m_textbox:setTextSize(18)
 		--self._m_textbox:setTextSize(12,72)
 		--self._m_textbox:setYFlip(true)
-		self._m_textbox:setRect(0,0,500,100)
+		self._m_textbox:setRect(0,0,600,600)
 
 		self._m_textbox:setString(self.text)
 

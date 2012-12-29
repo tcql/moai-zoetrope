@@ -53,6 +53,18 @@ App = Class:extend
 	-- window loses focus?
 	deactivateOnBlur = true,
 	
+
+	-- Property: allowScreenRotation
+	-- Should the screen automatically rotate on mobile devices then the screen orientation
+	-- changes?
+	allowScreenRotation = true,
+
+
+	-- Property: allowResizing
+	-- Should users be allowed to resize the application window when playing on desktop platforms?
+	allowResizing = true,
+
+
 	-- Property: view
 	-- The current <View>. When the app is running, this is also accessible
 	-- globally via <the>.view. In order to switch views, you must set this
@@ -116,17 +128,6 @@ App = Class:extend
 		
 		-- input
 
-		if love.keyboard then
-			obj.keys = obj.keys or Keys:new()
-			love.keyboard.setKeyRepeat(0.4, 0.04)
-			obj.meta:add(obj.keys)
-		end
-
-		if love.mouse then
-			obj.mouse = obj.mouse or Mouse:new()
-			obj.meta:add(obj.mouse)
-		end
-
 		if love.joystick then
 			obj.gamepads = {}
 			the.gamepads = obj.gamepads
@@ -138,10 +139,6 @@ App = Class:extend
 				obj.meta:add(obj.gamepads[i])
 			end
 		end
-
-		-- screen dimensions and state
-
-		obj.width, obj.height, obj.fullscreen = love.graphics.getMode()
 		--]]
 		-- housekeeping
 		
@@ -154,46 +151,231 @@ App = Class:extend
 		--]]
 
 		--[[ ----------------------------------------------------------- --]]
-		
-		if not self.width then 
-			screenWidth = MOAIEnvironment.screenWidth or 640
-		end 
-
-		if not self.height then 
-			screenHeight = MOAIEnvironment.screenHeight or 480
-		end			
-
-		self.width = screenWidth
-		self.height = screenHeight
+	
+		if self:isMobile() then 
+			self.width,self.height = MOAIGfxDevice.getViewSize()
+		else
+			self.width 	= self.width or 800 
+			self.height = self.height or 600
+		end
 
 		-- Open up the window
-		MOAISim.openWindow("Window",screenWidth,screenHeight)
+		MOAISim.openWindow("Window",self.width,self.height)
 
 		self.view = View:new()
 		the.view = self.view
 
-		self.mouse = self.mouse or Mouse:new()
-		the.view:add(self.mouse)
-		-- add a layer to the viewport
-		--layer = MOAILayer2D.new()
-		--layer:setViewport(viewport)
+		-- Selectively add the input components
+		if self:hasMouse() then 
+			self.mouse = self.mouse or Mouse:new()
+			the.view:add(self.mouse)
+		end
 
-		--self.layer = layer
+		if self:hasAccelerometer() then
+			self.accelerometer = self.accelerometer or Accelerometer:new()
+			the.view:add(self.accelerometer)
+		end
 
-		--MOAIGfxDevice.setClearColor(1,0.41,0.70,1)
-		--MOAIRenderMgr.pushRenderPass(layer)
+		if self:hasTouch() then 
+			self.touch = self.touch or Touch:new() 
+			the.view:add(self.touch)
+		end
 
+		if self:hasGPS() then 
+			self.gps = self.gps or GPS:new()
+			the.view:add(self.gps)
+		end
+
+
+		-- Note... currently, disabling allowResizing 
+		-- is /completely breaking/ android. you simply get a black screen
+
+		-- Resizing only applies on desktop, and screen rotation only applies on mobile,
+		-- but they both use the same underlying mechanics
+		if (self.allowResizing and self:isDesktop()) or (self.allowScreenRotation and self:isMobile())then
+			MOAIGfxDevice.setListener ( MOAIGfxDevice.EVENT_RESIZE, 
+				function(width,height)
+					self:setSizeAndOrientation(width,height)
+				end
+			)
+		end
+		
+
+		-- Set what the time between update ticks should be
 		MOAISim.setStep(1/self.fps)
 
 		--[[ ----------------------------------------------------------- --]]
 
-
-
-
 		the.app = obj
 		if obj.onNew then obj:onNew() end
+
+
 		return obj
+
 	end,
+
+
+	-- TODO: make this part of the DEBUG setup (once that's actually a thing)
+	_debugInputs = function()
+		for k,v in pairs(MOAIInputMgr.device.__index) do
+            print(k)
+        end
+	end,
+
+
+	-- Method: hasMouse
+	-- Returns a boolean describing whether or not a mouse interface
+	-- is available
+	--
+	-- Arguments:
+	--		none 
+	--
+	-- Returns:
+	-- 		boolean whether there is a mouse interface
+
+	hasMouse = function () 
+		if MOAIInputMgr.device.pointer then 
+			return true 
+		else 
+			return false 
+		end
+	end,
+
+
+	-- Method: hasTouch
+	-- Returns a boolean describing whether or not a touch interface
+	-- is available
+	--
+	-- Arguments:
+	--		none
+	-- 
+	-- Returns: 
+	-- 		boolean whether there is a touch interface
+
+	hasTouch = function ()
+		if MOAIInputMgr.device.touch then 
+			return true
+		else 
+			return false
+		end
+	end,
+
+
+	-- Method: hasAccelerometer
+	-- Returns a boolean describing whether or not an
+	-- accelerometer is available
+	--
+	-- Arguments:
+	-- 		none 
+	--
+	-- Returns:
+	-- 		boolean whether there is an accelerometer
+
+	hasAccelerometer = function () 
+		if MOAIInputMgr.device.level then
+			return true
+		else 
+			return false
+		end
+	end,
+
+
+	-- Method: hasGPS
+	-- Returns a boolean describing whether or not
+	-- a GPS interface is available
+	-- 
+	-- Arguments:
+	-- 		none
+	--
+	-- Returns:
+	-- 		boolean whether there is a keyboard interface
+
+	hasGPS = function ()
+		if MOAIInputMgr.device.location then 
+			return true
+		else
+			return false
+		end
+	end,
+
+
+	-- Method: hasKeyboard
+	-- Returns a boolean describing whether or not 
+	-- a keyboard interface is available
+	-- 
+	-- Arguments:
+	-- 		none
+	--
+	-- Returns:
+	-- 		boolean whether there is a keyboard interface
+
+	hasKeyboard = function () 
+		if MOAIInputMgr.device.keyboard then 
+			return true
+		else 
+			return false 
+		end
+	end,
+
+
+	-- Method: isMobile
+	-- Returns a boolean describing whether or not
+	-- the app is currently running on a mobile platform
+	--
+	-- Arguments:
+	-- 		none
+	-- 
+	-- Returns:
+	-- 		boolean whether the app is running on a mobile platform
+
+	isMobile = function (self)
+		local platform = self:getPlatform()
+
+		if platform == "Android" or platform == "iOS" then 
+			return true
+		else 
+			return false
+		end
+	end,
+
+
+	-- Method: isDesktop
+	-- Returns a boolean describing whether or not 
+	-- the app is currently running on a desktop platform
+	--
+	-- Arguments:
+	-- 		none
+	-- 
+	-- Returns:
+	-- 		boolean whether the app is running on a desktop platform
+	isDesktop = function (self)
+		return not self:isMobile()
+	end,
+
+
+	-- Method: getPlatform
+	-- Returns which platform the app is running on
+	--
+	-- Arguments:
+	-- 		none
+	--
+	-- Returns
+	-- 		string name of the platform the app is running on
+	getPlatform = function ()
+		return MOAIEnvironment.osBrand
+	end,
+
+
+	-- TODO: support custom world scaling.
+	-- Right now scaling is forced 1:1
+	setSizeAndOrientation = function (self, width, height)
+		self.width = width
+		self.height = height
+		
+		self.view._m_viewport:setSize(width,height)
+		self.view._m_viewport:setScale(width,-height)
+	end,
+
 
 	-- Method: run
 	-- Starts the app running. Nothing will occur until this call.
@@ -203,7 +385,6 @@ App = Class:extend
 	-- 
 	-- Returns:
 	--		nothing
-
 	run = function (self)
 		math.randomseed(os.time())
 
@@ -218,17 +399,8 @@ App = Class:extend
 			self.meta:add(self.console)
 		end
 
-		-- set up callbacks
-		--[[
-		love.graphics.setCaption(self.name)
-		love.update = function (elapsed) self:update(elapsed) end
-		love.draw = function() self:draw() end
-		love.focus = function (value) self:onFocus(value) end	
 
-		if self.onRun then self:onRun() end
-		self._nextFrameTime = love.timer.getMicroTime()
-		--]]
-
+		-- Initialize the game simulation loop
 
 		mainThread = MOAICoroutine.new() 
 		mainThread:run(
@@ -237,7 +409,9 @@ App = Class:extend
 
 					coroutine.yield()
 
-					
+					-- each tick, call the app's update method,
+					-- which will cascade update events into every 
+					-- element in the.view
 					self:update(MOAISim.getStep())
 
 				end
@@ -249,6 +423,7 @@ App = Class:extend
 		
 	end,
 	
+
 	-- Method: quit
 	-- Quits the application immediately.
 	--
@@ -259,8 +434,9 @@ App = Class:extend
 	--		nothing
 
 	quit = function (self)
-		love.event.quit()
+		os.exit()
 	end,
+
 
 	-- Method: useSysCursor
 	-- Shows or hides the system mouse cursor.
@@ -279,6 +455,7 @@ App = Class:extend
 
 		love.mouse.setVisible(value)
 	end,
+
 
 	-- Method: enterFullscreen
 	-- Enters fullscreen mode. If the app is already in fullscreen, this has no effect.
@@ -430,33 +607,10 @@ App = Class:extend
 		if the.view ~= view then the.view = view end
 		
 		elapsed = elapsed * self.timeScale
-		--[[
-		-- set the next frame time right at the start
-		self._nextFrameTime = self._nextFrameTime + 1 / self.fps
-
-		elapsed = elapsed - (self._sleepTime or 0)
-
-		local realElapsed = elapsed
-		elapsed = elapsed * self.timeScale
-
-		-- sync the.view with our current view
-		
-		
-		if the.view ~= view then the.view = view end
-
-		-- if we are not active at all, sleep for a half-second
-
-		if not self.active then
-			love.timer.sleep(0.5)
-			self._sleepTime = 0.5
-			return
-		end
-
-		self._sleepTime = 0
 
 		-- update everyone
 		-- app gets precedence, then meta view, then view
-		--]]
+		
 		if self.onStartFrame then self:onStartFrame(elapsed) end
 		--self.meta:startFrame(elapsed)
 		

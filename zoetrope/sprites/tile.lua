@@ -99,5 +99,32 @@ Tile = Sprite:extend {
 			self._m_object:setRot(math.deg(self.rotation))
 		end
 
-	end
+	end,
+
+	__tostring = function (self)
+        local result = 'Tile (x: ' .. self.x .. ', y: ' .. self.y ..
+                                   ', w: ' .. self.width .. ', h: ' .. self.height .. ', '
+
+        result = result .. 'image \'' .. self.image .. '\', '
+
+        if self.active then
+                result = result .. 'active, '
+        else
+                result = result .. 'inactive, '
+        end
+
+        if self.visible then
+                result = result .. 'visible, '
+        else
+                result = result .. 'invisible, '
+        end
+
+        if self.solid then
+                result = result .. 'solid'
+        else
+                result = result .. 'not solid'
+        end
+
+        return result .. ')'
+    end
 }
