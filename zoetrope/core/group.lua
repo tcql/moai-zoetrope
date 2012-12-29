@@ -84,23 +84,8 @@ Group = Class:extend
 
 		table.insert(self.sprites,sprite)
 
-		-- todo: fix this...
 		if sprite._m_object then 
 			self._m_layer:insertProp(sprite._m_object)
-
-			--[[
-			if sprite:instanceOf(Group) then 
-				sprite._m_object:setViewport(the.view._m_viewport)
-			end
-			--]]
-
-			-- TODO: figure out why this line is REALLY screwy.
-			-- It seems to be necessary when dealing with nested groups (?)
-			-- but completely breaks things when not.
-			-- With it removed, the timescales demo is broken,
-			-- with it added in, the touch demo doesn't work correctly, because 
-			-- things aren't :remove()'d  correctly
-			--MOAIRenderMgr.pushRenderPass(sprite._m_object)
 		end
 	end,
 

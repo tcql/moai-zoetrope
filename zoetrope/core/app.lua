@@ -171,6 +171,11 @@ App = Class:extend
 			the.view:add(self.mouse)
 		end
 
+		if self:hasKeyboard() then 
+			self.keyboard = self.keyboard or Keys:new()
+			the.view:add(self.keyboard)
+		end
+
 		if self:hasAccelerometer() then
 			self.accelerometer = self.accelerometer or Accelerometer:new()
 			the.view:add(self.accelerometer)
@@ -238,6 +243,16 @@ App = Class:extend
 			return true 
 		else 
 			return false 
+		end
+	end,
+
+
+
+	hasKeyboard = function ()
+		if MOAIInputMgr.device.keyboard then 
+			return true
+		else
+			return false
 		end
 	end,
 

@@ -36,9 +36,6 @@ Tile = Sprite:extend {
 
 			if not self.height then self.height = height end
 
-			if not self.tileSize.width then self.tileSize.width = width end
-			if not self.tileSize.height then self.tileSize.height = height end
-
 
 			-- TODO: use Cached to optimize this; each individual spritesheet that is loaded
 			-- should be a MOAIGfxQuadDeck2D (probably), then individual Sprite classes that USE

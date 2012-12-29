@@ -120,9 +120,11 @@ require 'zoetrope.core.globals'
 
 require 'zoetrope.core.group'
 
+
 require 'zoetrope.core.view'
 require 'zoetrope.core.sprite'
 require 'zoetrope.input.mouse'
+require 'zoetrope.input.keys'
 require 'zoetrope.input.accelerometer'
 require 'zoetrope.input.touch'
 require 'zoetrope.input.gps'
