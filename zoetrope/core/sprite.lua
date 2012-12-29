@@ -1,7 +1,39 @@
- 
+-- Class: Sprite
+-- A sprite receives all update-related events and draws
+-- itself onscreen with its draw() method. It is defined
+-- by a rectangle; nothing it draws should be outside that
+-- rectangle.
+--
+-- In most cases, you don't want to create a sprite directly.
+-- Instead, you'd want to use a subclass tailored to your needs.
+-- Create a new subclass if you need to heavily customize how a 
+-- sprite is drawn onscreen.
+--
+-- If you don't need something to display onscreen, just
+-- to listen to updates, set the sprite's visible property to false.
+--
+-- Extends:
+--		<Class>
+--
+-- Event: onDraw
+-- Called after drawing takes place.
+--
+-- Event: onUpdate
+-- Called once each frame, with the elapsed time since the last frame in seconds.
+--
+-- Event: onBeginFrame
+-- Called once each frame like onUpdate, but guaranteed to fire before any others' onUpdate handlers.
+--
+-- Event: onEndFrame
+-- Called once each frame like onUpdate, but guaranteed to fire after all others' onUpdate handlers.
+--
+-- Event: onCollide
+-- Called when the sprite intersects another during a collide() call. When a collision is detected,
+-- this event occurs for both sprites. The sprite is passed three arguments: the other sprite, the
+-- horizontal overlap, and the vertical overlap between the other sprite, in pixels. 
 
  Sprite = Class:extend {
--- Property: active
+	-- Property: active
 	-- If false, the sprite will not receive an update-related events.
 	active = true,
 
@@ -105,12 +137,234 @@
 		self._m_object:setVisible(false)
 	end,
 
+
+
+	-- Method: revive
+	-- Makes this sprite completely active. It will receive
+	-- update events, draw itself, and be collided.
+	--
+	-- Arguments:
+	--		none
+	--
+	-- Returns:
+	-- 		nothing
+
 	revive = function(self)
 		self.active = true
 		sefl.visible = true
 		self.solid = true
 		self._m_object:setVisible(true)
 	end,
+
+
+	-- Method: collide
+	-- Checks whether sprites collide by checking rectangles. If a collision is detected,
+	-- onCollide() is called on both this sprite and the one it collides with, passing
+	-- the amount of horizontal and vertical overlap between the sprites in pixels.
+	--
+	-- Arguments:
+	--		other - <Sprite> or <Group> to collide
+	--
+	-- Returns:
+	--		boolean, whether any collision was detected
+
+	collide = function (self, other)
+		if not self.solid or not other.solid or self == other then return false end
+
+		if other.sprites then
+			return other:collide(self)
+		else
+			-- this is cribbed from
+			-- http://frey.co.nz/old/2007/11/area-of-two-rectangles-algorithm/
+
+			local right = self.x + self.width
+			local bottom = self.y + self.height
+			local othRight = other.x + other.width
+			local othBottom = other.y + other.height
+				
+			-- is there an overlap at all?
+			
+			if self.x < othRight and right > other.x and
+			   self.y < othBottom and bottom > other.y then
+			   
+				-- calculate overlaps and call onCollide()
+				local horizOverlap = math.min(right, othRight) - math.max(self.x, other.x)
+				local vertOverlap = math.min(bottom, othBottom)- math.max(self.y, other.y)
+			
+				if self.onCollide then
+					self:onCollide(other, horizOverlap, vertOverlap)
+				end
+				
+				if other.onCollide then
+					other:onCollide(self, horizOverlap, vertOverlap)
+				end
+
+				return true
+			end
+		end
+
+		return false
+	end,
+
+
+
+	-- Method: displace
+	-- Displaces another sprite so that it no longer overlaps this one.
+	-- This by default seeks to move the other sprite the least amount possible.
+	-- You can give this function a hint about which way it ought to move the other
+	-- sprite (e.g. by consulting its current motion) through the two optional
+	-- arguments. A single displace() call will *either* move the other sprite
+	-- horizontally or vertically, not along both axes.
+	--
+	-- Arguments:
+	--		other - sprite to displace
+	-- 		xHint - force horizontal displacement in one direction, uses direction constants, optional
+	--		yHint - force vertical displacement in one direction, uses direction constants, optional
+	--
+	-- Returns:
+	--		nothing
+
+	displace = function (self, other, xHint, yHint)	
+		if not self.solid or self == other then return false end
+		if STRICT then assert(other:instanceOf(Sprite), 'asked to displace a non-sprite') end
+			
+		local left = self.x
+		local right = self.x + self.width
+		local top = self.y
+		local bottom = self.y + self.height
+		local othLeft = other.x
+		local othRight = other.x + other.width
+		local othTop = other.y
+		local othBottom = other.y + other.height
+		local xChange = 0
+		local yChange = 0
+		
+		-- resolve horizontal overlap
+		
+		if (othLeft >= left and othLeft <= right) or
+		   (othRight >= left and othRight <= right) or
+		   (left >= othLeft and left <= othRight) or
+		   (right >= othLeft and right <= othRight) then
+			local leftMove = (othLeft - left) + other.width
+			local rightMove = right - othLeft
+			
+			if xHint == LEFT then
+				xChange = - leftMove
+			elseif xHint == RIGHT then
+				xChange = rightMove
+			else
+				if leftMove < rightMove then
+					xChange = - leftMove
+				else
+					xChange = rightMove
+				end
+			end
+		end
+		
+		-- resolve vertical overlap
+
+		if (othTop >= top and othTop <= bottom) or
+		   (othBottom >= top and othBottom <= bottom) or
+		   (top >= othTop and top <= othBottom) or
+		   (bottom >= othTop and bottom <= othBottom) then
+			local upMove = (othTop - top) + other.height
+			local downMove = bottom - othTop
+			
+			if yHint == UP then
+				yChange = - upMove
+			elseif yHint == DOWN then
+				yChange = downMove
+			else
+				if upMove < downMove then
+					yChange = - upMove
+				else
+					yChange = downMove
+				end
+			end
+		end
+		
+		-- choose the option that moves the other sprite the least
+		
+		if math.abs(xChange) > math.abs(yChange) then
+			other.y = other.y + yChange
+		else
+			other.x = other.x + xChange
+		end
+	end,
+
+
+	-- Method: intersects
+	-- Returns whether a point or rectangle intersects with this sprite.
+	-- If you want to check whether a particular sprite intersects with this one,
+	-- use <collide>.
+	--
+	-- Arguments:
+	--		x - top left horizontal coordinate
+	--		y - top left vertical coordinate
+	--		width - width of the rectangle, omit for points
+	--		height - height of the rectangle, omit for points
+	--
+	-- Returns:
+	--		boolean
+
+	intersects = function (self, x, y, width, height)
+		local right = x + (width or 0)
+		local bottom = y + (height or 0)
+
+		return self.x < right and self.x + self.width > x and
+		       self.y < bottom and self.y + self.height > y
+	end,
+
+
+	-- Method: push
+	-- Moves another sprite as if it had the same motion properties as this one.
+	--
+	-- Arguments:
+	--		other - other sprite to push
+	--		elapsed - elapsed time to simulate, in seconds
+	--
+	-- Returns:
+	--		nothing
+
+	push = function (self, other, elapsed)
+		other.x = other.x + self.velocity.x * elapsed
+		other.y = other.y + self.velocity.y * elapsed
+	end,
+
+
+	-- Method: distanceTo
+	-- Returns the distance from this sprite to either another sprite or 
+	-- an arbitrary point. This uses the center of sprites to calculate the distance.
+	--
+	-- Arguments:
+	--		Can be either one argument, a sprite (or any other table with x
+	--		and y properties), or two arguments, which correspond to a point.
+	--
+	-- Returns:
+	--		distance in pixels
+
+	distanceTo = function (self, ...)
+		local arg = {...}
+		local midX = self.x + self.width / 2
+		local midY = self.y + self.width / 2
+
+		if #arg == 1 then
+			local spr = arg[1]
+
+			if STRICT then
+				assert(type(spr.x) == 'number' and type(spr.y) == 'number', 'asked to calculate distance to an object without numeric x and y properties')
+			end
+
+			local sprX = spr.x + spr.width / 2
+			local sprY = spr.y + spr.height / 2
+
+			return math.sqrt((midX - sprX)^2 + (midY - sprY)^2)
+		else
+			return math.sqrt((midX - arg[1])^2 + (midY - arg[2])^2)
+		end
+	end,
+
+
 
 	startFrame = function(self,elapsed)
 		if self.onStartFrame then self:onStartFrame(elapsed) end

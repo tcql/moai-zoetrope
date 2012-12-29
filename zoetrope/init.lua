@@ -129,6 +129,7 @@ require 'zoetrope.input.gps'
 
 require 'zoetrope.sprites.animation'
 require 'zoetrope.sprites.text'
+require 'zoetrope.sprites.fill'
 require 'zoetrope.sprites.tile'
 --[[
 require 'zoetrope.core.cached'
