@@ -27,6 +27,18 @@ View = Group:extend{
 
 		Group.add(self,sprite)
 
+		-- TODO: figure out why this line is REALLY screwy.
+		-- It seems to be necessary when dealing with nested groups (?)
+		-- but completely breaks things when not.
+		-- With it removed, the timescales demo is broken,
+		-- with it added in, the touch demo doesn't work correctly, because 
+		-- things aren't :remove()'d  correctly
+
+        -- Note: I think checking this instance check /should/ fix issues?
+		if not sprite:instanceOf(Group) then 
+            MOAIRenderMgr.pushRenderPass(sprite._m_object)
+        end
+
 	end,
 
 
