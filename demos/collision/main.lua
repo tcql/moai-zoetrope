@@ -23,8 +23,19 @@ the.app = App:extend
             fill = {0,255,0},
 
             onUpdate = function(self,dt)
-                self.x = the.mouse.x
-                self.y = the.mouse.y
+                if the.keys:pressed('a') then
+                    self.velocity.x = -80
+                elseif the.keys:pressed('s') then
+                    self.velocity.x = 80
+                elseif the.keys:pressed('w') then
+                    self.velocity.y = -80
+                elseif the.keys:pressed('d') then
+                    self.velocity.y = 80
+                else
+                    self.velocity.x = 0
+                    self.velocity.y = 0
+                end
+                
             end,
 
             onCollide = function(self,other)
