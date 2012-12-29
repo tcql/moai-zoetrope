@@ -2,7 +2,6 @@ Tile = Sprite:extend {
 
 	imageOffset = {x = 0, y = 0},
 
-
 	-- private property: keeps track of properties that need action
 	-- to be taken when they are changed
 	-- image must be a nonsense value, not nil,
@@ -24,27 +23,56 @@ Tile = Sprite:extend {
 	updateQuad = function(self)
 		if self.image then 
 			
+
+
 			local texture = MOAITexture.new()
 			texture:load(self.image)
+
+			-- this is /very/ important for texture repeating to work
+			texture:setWrap(true)
 			local width,height = texture:getSize()
 
 			if not self.width then self.width = width end 
 
 			if not self.height then self.height = height end
 
+			if not self.tileSize.width then self.tileSize.width = width end
+			if not self.tileSize.height then self.tileSize.height = height end
+
+
 			-- TODO: use Cached to optimize this; each individual spritesheet that is loaded
 			-- should be a MOAIGfxQuadDeck2D (probably), then individual Sprite classes that USE
 			-- them can add quads
 			local spritesheet = MOAIGfxQuad2D.new()
-			spritesheet:setTexture(self.image)
+			spritesheet:setTexture(texture)
+			spritesheet:setRect(0,0,self.width,self.height)
+
+			-- This is kind of interesting. Take this example... we are using a 32*32
+			-- tile. We want to draw it at width = 128 and height = 32. Usually when you 
+			-- draw tiles, you want them to have UVRect 0,0,1,1, or if you are drawing a partial 
+			-- tile, then have some fraction of that. Since we are (potentially) repeating the tile 
+			-- many times, though, the UV can be much greater than 1 (because our texture has setWrap(true)),
+			-- we'll actually have valid texture data beyond U or V = 1).
+
+			-- substituting, 
+			-- width = the width of the source image
+			-- height = height of the source image
+			--
+			-- x0: 0 / 32 	= 0,
+			-- y0: 0 / 32 	= 0,
+			-- x1: 128 / 32 = 4,
+			-- y1: 32 / 32 	= 1
+			--
+			-- So our resulting texture stretches from UV 0,0 to 4,1, meaning it is repeated
+			-- 4 times along the X axis
 			spritesheet:setUVRect(
 				self.imageOffset.x / width,
 				self.imageOffset.y / height,
-				(self.imageOffset.x+self.width) / width,
-				(self.imageOffset.y+self.height) / height	
+				(self.imageOffset.x + self.width) / width,
+				(self.imageOffset.y + self.height) / height
+				
 			)
-			spritesheet:setRect(0,0,self.width,self.height)
-
+			
 			local prop
 			if not self._m_object then 
 				prop = MOAIProp2D.new()
@@ -52,7 +80,7 @@ Tile = Sprite:extend {
 				prop = self._m_object
 			end
 
-			prop:setDeck(spritesheet)
+			prop:setDeck(spritesheet)			
 			self._m_object = prop
 			
 			-- This sets up the translation node for this 
