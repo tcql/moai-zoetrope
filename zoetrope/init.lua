@@ -112,16 +112,17 @@ if STRICT then
 	})
 end
 --]]
-require 'zoetrope.core.class'
 
+ZOE_PATH = MOAIFileSystem.getAbsoluteDirectoryPath("zoetrope")
+
+require 'zoetrope.core.class'
+require 'zoetrope.core.globals'
 require 'zoetrope.core.app'
 
-require 'zoetrope.core.globals'
-
 require 'zoetrope.core.group'
-
-
+require 'zoetrope.core.cached'
 require 'zoetrope.core.view'
+
 require 'zoetrope.core.sprite'
 require 'zoetrope.input.mouse'
 require 'zoetrope.input.keys'

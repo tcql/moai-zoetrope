@@ -23,6 +23,7 @@ the.app = App:extend {
 		group:add(
 			Text:new 
 			{
+				font = { size = 18 },
 				y = 100,
 				x = 28,
 				text = "Hello!"
