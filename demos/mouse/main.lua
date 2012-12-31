@@ -1,6 +1,7 @@
 
 require 'zoetrope.init'
 
+
 the.app = App:extend {
 	onNew = function(self)
 		t = Tile:new {
@@ -14,7 +15,6 @@ the.app = App:extend {
 			onUpdate = function(self,dt)
 				if the.mouse:pressed('l') then
 					self.velocity.rotation = -7
-					--self.acceleration.rotation = 2
 				elseif the.mouse:pressed('r') then
  					self.velocity.rotation = 7
  				else
@@ -22,12 +22,12 @@ the.app = App:extend {
 				end
 				self.x = the.mouse.x
 				self.y = the.mouse.y
-				--self.rotation = self.rotation+math.rad(180)*dt
-				--self.x = self.x+20*dt
+			
 			end
 		}
 		text =Text:new {
-
+			width = 250,
+			height = 150,
 			onUpdate = function(self,dt)
 				self.text = "Mouse X: "..the.mouse.x .. "\n" 
 					.. "Mouse Y: "..the.mouse.y.."\n"

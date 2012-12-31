@@ -26,7 +26,12 @@ the.app = App:extend {
 		}
 		anim.currentSequence = 'right'
 
-		t2 = Text:new { text = "Left Click to Play \nRight Click to Pause\nMiddle Click to switch animation" }
+		t2 = Text:new { 
+			width = 100,
+			text = "Left Click to Play \n"
+				.. "Right Click to Pause\n"
+				.. "Middle Click to switch animation" 
+		}
 
 		self:add(anim)
 		self:add(t)

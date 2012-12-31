@@ -34,6 +34,8 @@ the.app = App:extend
         self:_debugInputs()
         
         text = Text:new {
+            width = 450,
+            height = 150,
             onUpdate = function (self,dt)
                 if the.app:hasTouch() then 
 

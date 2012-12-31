@@ -9,7 +9,7 @@ the.app = App:extend {
         end
 
         local text = Text:new {
-
+            width = 150,
             onUpdate = function(self,dt)
                 if the.app:hasGPS() then
                     self.text = "Lat: "..the.gps.lat.."\n"

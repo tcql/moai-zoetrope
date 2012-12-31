@@ -26,6 +26,7 @@ the.app = App:extend {
 				font = { size = 18 },
 				y = 100,
 				x = 28,
+				width = 80,
 				text = "Hello!"
 			}
 		)
