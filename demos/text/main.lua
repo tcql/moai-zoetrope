@@ -21,8 +21,8 @@ the.app = App:extend
             horizontalAlign = 'center',
             wordBreak = true,
             velocity = {rotation = 1},
-
             _scaleRot = 0,
+            
             onUpdate = function(self,dt)
                 self.scale = 1.5+math.sin(self._scaleRot)
                 self._scaleRot = self._scaleRot+0.8*dt 
