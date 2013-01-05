@@ -1,5 +1,6 @@
 
 require 'zoetrope.init'
+MOAIDebugLines.setStyle ( MOAIDebugLines.TEXT_BOX, 2, 1, 0, 1, 1 )
 
 
 local time = 0
@@ -16,7 +17,8 @@ the.app = App:extend {
 		-- by the App onUpdate.
 		text1 = Text:new 
 		{
-
+			width = 320,
+			height = 50,
 			onUpdate = function(self,dt) 
 				time = time+dt
 					
@@ -30,6 +32,8 @@ the.app = App:extend {
 		text2 = Text:new 
 		{
 			y = 50,
+			width = 320,
+			height = 50,
 			onUpdate = function(self,dt)
 				local tl = tostring(dt):sub(0,6)
 				self.text = "Actual Time (delta-time: "..tl.."): \n"..tostring(MOAISim.getElapsedTime()):sub(0,6)
@@ -41,6 +45,8 @@ the.app = App:extend {
 		text3 = Text:new 
 		{
 			y = 120,
+			width = 320,
+			height = 50,
 			onUpdate = function(self,dt)
 				time2 = time2+dt
 				self.text = "Timescaled Group (at scale "..grp2.timeScale.."): \n"..tostring(time2):sub(0,6)
@@ -55,11 +61,11 @@ the.app = App:extend {
 		-- Nested groups work. You can swap the two lines below to see 
 		-- that nested groups display and that their timescales also work 
 		--grp:add(grp2)
-		self:add(grp2)
 
 
-		self:add(grp)
 		self:add(text2)
+		self:add(grp)
+		self:add(grp2)
 	end,
 
 
